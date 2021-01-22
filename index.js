@@ -2,23 +2,23 @@ const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 exports.handler = async (event, context, callback) => {
-  // const { id } = event.pathParameters
-  console.log(event)
-  console.log(event.params.path.id)
-  
-  const { id } = event.params.path
-  
-  console.log(`deleting id: ${id}`)
+  console.error(event['body-json'])
+  let exercise = event['body-json']
 
   var params = {
     TableName : 'exercises',
     Key: {
-      id: id
+      id: exercise.id
     }
-  }
+  };
+  
+  // documentClient.delete(params, function(err, data) {
+  //   if (err) console.log(err);
+  //   else console.log(data);
+  // });
 
   try {
-    await docClient.delete(params).promise()
+    data = await docClient.delete(params).promise()
     console.log('status: 200')
   } catch (error) {
     console.log('Status code : 400, Error code : ', error.stack)
@@ -26,6 +26,7 @@ exports.handler = async (event, context, callback) => {
 
   return {
     statusCode: 200,
+    body: JSON.stringify(exercise),
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Content-Type': 'application/json'
